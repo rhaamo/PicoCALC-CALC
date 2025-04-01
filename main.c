@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "core/lv_obj.h"
+#include "core/lv_obj_style.h"
+#include "core/lv_obj_style_gen.h"
 #include "misc/lv_palette.h"
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
@@ -45,6 +47,8 @@ lv_obj_t *ui_label_status_right;
 lv_obj_t *ui_history;
 lv_obj_t *ui_history_container;
 lv_obj_t *ui_input;
+lv_style_t font_12;
+lv_style_t font_14;
 
 bool is_ascii(char c) {
     return (c>=0 && c<=127);
@@ -119,6 +123,7 @@ void handle_textarea_command(const char *command_input) {
     }
     // Scroll to bottom
     lv_obj_t *parent = lv_obj_get_parent(ui_history);
+    printf("cur scroll: %i", lv_obj_get_scroll_bottom(parent));
     lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
 }
 
@@ -181,10 +186,9 @@ void build_screen() {
     ui_history = lv_label_create(ui_history_container);
     lv_obj_set_height(ui_history, 245);
     lv_obj_set_width(ui_history, lv_pct(99));
-    lv_obj_set_x(ui_history, -89);
-    lv_obj_set_y(ui_history, -100);
     lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
     lv_label_set_long_mode(ui_history, LV_LABEL_LONG_WRAP);
+    lv_obj_add_style(ui_history, &font_12, 0);
     lv_label_set_text(ui_history, "");
 
     // Input
@@ -227,6 +231,11 @@ int main() {
 
     // Initialize the keyboard input device (implementation in lv_port_indev_kbd.c)
     lv_port_indev_init();
+
+    lv_style_init(&font_12);
+    lv_style_set_text_font(&font_12, &lv_font_montserrat_12);
+    lv_style_init(&font_14);
+    lv_style_set_text_font(&font_14, &lv_font_montserrat_14);
 
     // Build the screen
     build_screen();
