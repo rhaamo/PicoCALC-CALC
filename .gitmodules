@@ -1,0 +1,7 @@
+[submodule "lib/tinyexpr"]
+	path = lib/tinyexpr
+	url = https://github.com/codeplea/tinyexpr
+[submodule "lib/lvgl/lvgl"]
+	path = lib/lvgl/lvgl
+	url = https://github.com/lvgl/lvgl.git
+	branch = release/v9.2
