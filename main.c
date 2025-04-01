@@ -114,7 +114,7 @@ void handle_textarea_command(const char *command_input) {
     }
     // Scroll to bottom
     lv_obj_t *parent = lv_obj_get_parent(ui_history);
-    lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_ON);
+    lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
 }
 
 static void textarea_event_handler(lv_event_t *e) {
