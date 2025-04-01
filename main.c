@@ -57,7 +57,7 @@ void handle_textarea_command(const char *command_input) {
     } else if (strcmp(command_input, "bat") == 0) {
         lv_label_ins_text(history, -1, "\n");
         char bat_buff[10];
-        snprintf(bat_buff, sizeof(bat_buff), "%f%%", read_battery());
+        snprintf(bat_buff, sizeof(bat_buff), "%i%%", read_battery());
         lv_label_ins_text(history, -1, bat_buff);
     } else if (strcmp(command_input, "help") == 0) {
         lv_label_ins_text(history, -1, "\nhelp:");
@@ -86,7 +86,6 @@ void handle_textarea_command(const char *command_input) {
 
 static void textarea_event_handler(lv_event_t *e) {
     lv_obj_t *ta = lv_event_get_target_obj(e);
-    printf("Textarea: %s", lv_textarea_get_text(ta));
     // Update history
     //lv_label_set_text_fmt(history, "%s\n> %s", lv_label_get_text(history), lv_textarea_get_text(ta));
     lv_label_ins_text(history, -1, "\n> ");
@@ -196,7 +195,7 @@ int main() {
         // Update battery every minutes
         if (lv_tick_get()-last_ticks >= 60000) {
             printf("one minute elapsed");
-            //update_battery_level();
+            update_battery_level();
             last_ticks = lv_tick_get();
         }
 
