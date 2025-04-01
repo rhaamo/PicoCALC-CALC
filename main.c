@@ -86,9 +86,14 @@ void handle_textarea_command(const char *command_input) {
         *((volatile uint32_t *)(PPB_BASE + 0x0ED0C)) = 0x5FA0004;
     } else if (strcmp(command_input, "bat") == 0) {
         lv_label_ins_text(ui_history, -1, "\n");
-        char bat_buff[10];
-        snprintf(bat_buff, sizeof(bat_buff), "%i%%", read_battery());
-        lv_label_ins_text(ui_history, -1, bat_buff);
+        int bat_level = read_battery();
+        if (bat_level > 100) {
+            lv_label_ins_text(ui_history, -1, "ERR%");
+        } else {
+            char bat_buff[10];
+            snprintf(bat_buff, sizeof(bat_buff), "%i%%", bat_level);
+            lv_label_ins_text(ui_history, -1, bat_buff);
+        }
     } else if (strcmp(command_input, "help") == 0) {
         lv_label_ins_text(ui_history, -1, "\nhelp:");
         lv_label_ins_text(ui_history, -1, "\n  flash: reset in flash mode");
@@ -198,7 +203,12 @@ void build_screen() {
 }
 
 void update_battery_level() {
-    lv_label_set_text_fmt(ui_label_status_right, "%i%%", read_battery());
+    int bat_level = read_battery();
+    if (bat_level > 100) {
+        lv_label_set_text(ui_label_status_right, "ERR%");
+    } else {
+        lv_label_set_text_fmt(ui_label_status_right, "%i%%", bat_level);
+    }
 }
 
 int main() {
