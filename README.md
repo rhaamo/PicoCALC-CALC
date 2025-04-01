@@ -1,4 +1,4 @@
-# PicoCalc Calc something
+# PicoCalc Calc Firmware
 
 This has been tested only with a Pico 2W.
 
