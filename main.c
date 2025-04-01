@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "core/lv_obj.h"
 #include "misc/lv_palette.h"
@@ -37,12 +38,41 @@
 
 const unsigned int LEDPIN = 25;
 
-lv_obj_t *screen;
-lv_obj_t *panel;
-lv_obj_t *label_status_left;
-lv_obj_t *label_status_right;
-lv_obj_t *history;
-lv_obj_t *input;
+lv_obj_t *ui_screen;
+lv_obj_t *ui_panel;
+lv_obj_t *ui_label_status_left;
+lv_obj_t *ui_label_status_right;
+lv_obj_t *ui_history;
+lv_obj_t *ui_history_container;
+lv_obj_t *ui_input;
+
+bool is_ascii(char c) {
+    return (c>=0 && c<=127);
+}
+
+char *sanitize_command(const char *in_cmd) {
+    // Workaround for now because the LVGL PicoCalc makes shift key in the textarea
+    size_t length = 0;
+    const char *p = in_cmd;
+    while (*p) {
+        if (is_ascii(*p)) length++;
+        p++;
+    }
+
+    char *out = malloc(length+1);
+    if (!out) return NULL;
+
+    char *dest = out;
+    while (*in_cmd) {
+        if (is_ascii(*in_cmd)) {
+            *dest++ = *in_cmd;
+        }
+        in_cmd++;
+    }
+    *dest = '\0';
+
+    return out;
+}
 
 void handle_textarea_command(const char *command_input) {
     printf("Got command: '%s'", command_input);
@@ -51,36 +81,39 @@ void handle_textarea_command(const char *command_input) {
     if (strcmp(command_input, "flash") == 0) {
         reset_usb_boot(0, 0);
     } else if (strcmp(command_input, "uwu") == 0) {
-        lv_label_ins_text(history, -1, "\n*snuggle you :3*");
+        lv_label_ins_text(ui_history, -1, "\n*snuggle you :3*");
     } else if (strcmp(command_input, "reset") == 0) {
         *((volatile uint32_t *)(PPB_BASE + 0x0ED0C)) = 0x5FA0004;
     } else if (strcmp(command_input, "bat") == 0) {
-        lv_label_ins_text(history, -1, "\n");
+        lv_label_ins_text(ui_history, -1, "\n");
         char bat_buff[10];
         snprintf(bat_buff, sizeof(bat_buff), "%i%%", read_battery());
-        lv_label_ins_text(history, -1, bat_buff);
+        lv_label_ins_text(ui_history, -1, bat_buff);
     } else if (strcmp(command_input, "help") == 0) {
-        lv_label_ins_text(history, -1, "\nhelp:");
-        lv_label_ins_text(history, -1, "\n  flash: reset in flash mode");
-        lv_label_ins_text(history, -1, "\n  reset: soft reset");
-        lv_label_ins_text(history, -1, "\n  bat: get battery level");
-        lv_label_ins_text(history, -1, "\n  uwu: ???");
-        lv_label_ins_text(history, -1, "\n  anything else will be fed to tinyexpr (he's hungry)");
+        lv_label_ins_text(ui_history, -1, "\nhelp:");
+        lv_label_ins_text(ui_history, -1, "\n  flash: reset in flash mode");
+        lv_label_ins_text(ui_history, -1, "\n  reset: soft reset");
+        lv_label_ins_text(ui_history, -1, "\n  bat: get battery level");
+        lv_label_ins_text(ui_history, -1, "\n  uwu: ???");
+        lv_label_ins_text(ui_history, -1, "\n  anything else will be fed to tinyexpr (he's hungry)");
     } else {
         // It's probably math, I hope
-        // but it doesn´t work because tinyexpr doesn't like me
-        double result = te_interp(command_input, 0);
-        lv_label_ins_text(history, -1, "\n");
-        // if (err != 0) {
-        //     lv_label_ins_text(history, -1, ":(");
-        // } else {
+        int err = 0;
+        double result = te_interp(sanitize_command(command_input), 0);
+
+        lv_label_ins_text(ui_history, -1, "\n");
+        if (err != 0) {
+            // It's not :(
+            lv_label_ins_text(ui_history, -1, "NaN :(");
+        } else {
+            // It is :)
             char buffer[32];
             snprintf(buffer, sizeof(buffer), "%f", result);
-            lv_label_ins_text(history, -1, buffer);
-        // }
+            lv_label_ins_text(ui_history, -1, buffer);
+        }
     }
     // Scroll to bottom
-    lv_obj_t *parent = lv_obj_get_parent(history);
+    lv_obj_t *parent = lv_obj_get_parent(ui_history);
     lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_ON);
 }
 
@@ -88,76 +121,84 @@ static void textarea_event_handler(lv_event_t *e) {
     lv_obj_t *ta = lv_event_get_target_obj(e);
     // Update history
     //lv_label_set_text_fmt(history, "%s\n> %s", lv_label_get_text(history), lv_textarea_get_text(ta));
-    lv_label_ins_text(history, -1, "\n> ");
-    lv_label_ins_text(history, -1, lv_textarea_get_text(ta));
+    lv_label_ins_text(ui_history, -1, "\n> ");
+    lv_label_ins_text(ui_history, -1, lv_textarea_get_text(ta));
     // Handle commands
-    handle_textarea_command(lv_textarea_get_text(input));
+    handle_textarea_command(lv_textarea_get_text(ui_input));
     // Clear input
-    lv_textarea_set_text(input, "");
+    lv_textarea_set_text(ui_input, "");
 }
 
 void build_screen() {
     // Screen
-    screen = lv_obj_create(NULL);
-    lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(screen, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    ui_screen = lv_obj_create(NULL);
+    lv_obj_clear_flag(ui_screen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_flex_flow(ui_screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_screen, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
     // Top panel
-    panel = lv_obj_create(screen);
-    lv_obj_set_width(panel, 320);
-    lv_obj_set_height(panel, 20);
-    lv_obj_set_align(panel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(panel, LV_OBJ_FLAG_SCROLLABLE);
+    ui_panel = lv_obj_create(ui_screen);
+    lv_obj_set_width(ui_panel, 320);
+    lv_obj_set_height(ui_panel, 20);
+    lv_obj_set_align(ui_panel, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_panel, LV_OBJ_FLAG_SCROLLABLE);
 
     // Top panel left element
-    label_status_left = lv_label_create(panel);
-    lv_obj_set_width(label_status_left, LV_SIZE_CONTENT);   /// 100
-    lv_obj_set_height(label_status_left, LV_SIZE_CONTENT);    /// 100
-    lv_obj_set_x(label_status_left, -140);
-    lv_obj_set_y(label_status_left, 0);
-    lv_obj_set_align(label_status_left, LV_ALIGN_CENTER);
-    lv_label_set_text(label_status_left, "build: ");
-    lv_label_ins_text(label_status_left, -1, __DATE__);
-    lv_label_ins_text(label_status_left, -1, " ");
-    lv_label_ins_text(label_status_left, -1, __TIME__);
+    ui_label_status_left = lv_label_create(ui_panel);
+    lv_obj_set_width(ui_label_status_left, lv_pct(79));   /// 100
+    lv_obj_set_height(ui_label_status_left, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_label_status_left, -41);
+    lv_obj_set_y(ui_label_status_left, 0);
+    lv_obj_set_align(ui_label_status_left, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_label_status_left, "build: ");
+    lv_label_ins_text(ui_label_status_left, -1, __DATE__);
+    lv_label_ins_text(ui_label_status_left, -1, " ");
+    lv_label_ins_text(ui_label_status_left, -1, __TIME__);
 
     // Top panel right element
-    label_status_right = lv_label_create(panel);
-    lv_obj_set_width(label_status_right, LV_SIZE_CONTENT);   /// 100
-    lv_obj_set_height(label_status_right, LV_SIZE_CONTENT);    /// 100
-    lv_obj_set_x(label_status_right, 135);
-    lv_obj_set_y(label_status_right, 0);
-    lv_obj_set_align(label_status_right, LV_ALIGN_CENTER);
-    lv_label_set_text(label_status_right, "069%");
+    ui_label_status_right = lv_label_create(ui_panel);
+    lv_obj_set_width(ui_label_status_right, LV_SIZE_CONTENT);   /// 100
+    lv_obj_set_height(ui_label_status_right, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_label_status_right, 135);
+    lv_obj_set_y(ui_label_status_right, 0);
+    lv_obj_set_align(ui_label_status_right, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_label_status_right, "069%");
 
     // Log
-    history = lv_label_create(screen);
-    lv_obj_set_height(history, 245);
-    lv_obj_set_width(history, lv_pct(99));
-    lv_obj_set_x(history, -89);
-    lv_obj_set_y(history, -100);
-    lv_obj_set_align(history, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(history, LV_LABEL_LONG_WRAP);
-    lv_label_set_text(history, "");
+    // The container
+    ui_history_container = lv_obj_create(ui_screen);
+    lv_obj_set_size(ui_history_container, 320, 245);
+    lv_obj_set_flex_flow(ui_history_container, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_scrollbar_mode(ui_history_container, LV_SCROLLBAR_MODE_AUTO);
+    lv_obj_set_scroll_dir(ui_history_container, LV_DIR_VER);
+
+    // The label itself
+    ui_history = lv_label_create(ui_history_container);
+    lv_obj_set_height(ui_history, 245);
+    lv_obj_set_width(ui_history, lv_pct(99));
+    lv_obj_set_x(ui_history, -89);
+    lv_obj_set_y(ui_history, -100);
+    lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_history, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(ui_history, "");
 
     // Input
-    input = lv_textarea_create(screen);
-    lv_obj_set_width(input, 320);
-    lv_obj_set_height(input, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_x(input, -10);
-    lv_obj_set_y(input, 91);
-    lv_obj_set_align(input, LV_ALIGN_CENTER);
+    ui_input = lv_textarea_create(ui_screen);
+    lv_obj_set_width(ui_input, 320);
+    lv_obj_set_height(ui_input, LV_SIZE_CONTENT);    /// 20
+    lv_obj_set_x(ui_input, -10);
+    lv_obj_set_y(ui_input, 91);
+    lv_obj_set_align(ui_input, LV_ALIGN_CENTER);
     // Enable keyboard input for the text box
-    lv_textarea_set_placeholder_text(input, "1+1=69");
-    lv_textarea_set_one_line(input, true);
-    lv_obj_set_style_anim_time(input, 5000, LV_PART_CURSOR|LV_STATE_FOCUSED);
+    lv_textarea_set_placeholder_text(ui_input, "1+1=69");
+    lv_textarea_set_one_line(ui_input, true);
+    lv_obj_set_style_anim_time(ui_input, 5000, LV_PART_CURSOR|LV_STATE_FOCUSED);
     // Textarea event handler
-    lv_obj_add_event_cb(input, textarea_event_handler, LV_EVENT_READY, input);
+    lv_obj_add_event_cb(ui_input, textarea_event_handler, LV_EVENT_READY, ui_input);
 }
 
 void update_battery_level() {
-    lv_label_set_text_fmt(label_status_right, "%i%%", read_battery());
+    lv_label_set_text_fmt(ui_label_status_right, "%i%%", read_battery());
 }
 
 int main() {
@@ -181,7 +222,7 @@ int main() {
     build_screen();
 
     // Load the screen
-    lv_scr_load(screen);
+    lv_scr_load(ui_screen);
 
     // Do it one time
     update_battery_level();

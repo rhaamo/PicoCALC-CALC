@@ -8,6 +8,12 @@ Build, flash, and type "help".
 
 Requires keyboard firmware update for battery display.
 
+## Issues
+
+- Scrolling for history is really bad and eats a bit of the bottom text
+- Battery reporting yolo?
+- Need fix in kbd handling to remove workaround code
+
 ## Build Instructions
 ```bash
 # Clone the repo
