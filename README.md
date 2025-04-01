@@ -4,6 +4,10 @@ This has been tested only with a Pico 2W.
 
 Build, flash, and type "help".
 
+## Notes
+
+Requires keyboard firmware update for battery display.
+
 ## Build Instructions
 ```bash
 # Clone the repo
