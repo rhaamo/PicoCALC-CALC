@@ -46,4 +46,4 @@ make
 ```
 
 #### Special thanks
-[Hsuan Han Lai](https://github.com/adwuard) for initial porting and demo project for the PicoCalc 
+[Hsuan Han Lai](https://github.com/adwuard) for initial LVGL porting and demo project for the PicoCalc 
