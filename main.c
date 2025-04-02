@@ -1,14 +1,4 @@
-/**
- * PicoCalc LVGL Graphics Demo
- * 
- * Demo App Uses LVGL to show demos on the PicoCalc.
- * Implements basic keyboard input and display driver. 
- * 
- * Author: HsuahHanLai
- * https://www.hsuanhanlai.com/
- */
-
-#include "main.h"
+#include <main.h>
 
 bool is_ascii(char c) {
     return (c>=0 && c<=127);

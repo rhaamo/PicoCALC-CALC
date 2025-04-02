@@ -1,30 +1,19 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <stdbool.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "core/lv_obj.h"
-#include "core/lv_obj_style.h"
-// #include "core/lv_obj_style_gen.h"
-// #include "misc/lv_palette.h"
-// #include "pico/stdlib.h"
-#include "hardware/gpio.h"
 
+#include <lv_port_indev_picocalc_kb.h>
+#include <lv_port_disp_picocalc_ILI9488.h>
 
-// #include "lv_conf.h"
-// #include "lvgl/lvgl.h"
-#include "lv_port_indev_picocalc_kb.h"
-#include "lv_port_disp_picocalc_ILI9488.h"
-// #include "themes/default/lv_theme_default.h"
-#include "tick/lv_tick.h"
-#include "widgets/label/lv_label.h"
-#include <string.h>
-#include "pico/bootrom.h"
-#include "i2ckbd.h"
+#include <pico/bootrom.h>
 
-#include "tinyexpr.h"
+#include <i2ckbd.h>
+
+#include <tinyexpr.h>
 
 #define ILI9488 1
 
