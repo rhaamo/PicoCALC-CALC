@@ -38,12 +38,12 @@ void handle_textarea_command(const char *command_input) {
         double result = te_interp(sanitize_command(command_input), &err);
 
         lv_label_ins_text(ui_history, -1, "\n");
-        char buffer[32];
+        // Max input plus 10 to be safe
+        char buffer[MAX_INPUT_LENGTH+10];
 
         if (err != 0) {
             // Implement some visual error thingy with space padding
-            // TODO: doesn't really pad properly, probably because a monospace font is needed
-            lv_snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err, " ");
+            lv_snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err-1, " ");
             lv_label_ins_text(ui_history, -1, buffer);
         } else {
             // Now properly print/format the result
@@ -126,7 +126,7 @@ void build_screen() {
     lv_obj_set_width(ui_history, lv_pct(99));
     lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
     lv_label_set_long_mode(ui_history, LV_LABEL_LONG_WRAP);
-    lv_obj_add_style(ui_history, &font_12, 0);
+    lv_obj_add_style(ui_history, &font_monospace, 0);
     lv_label_set_text(ui_history, "");
 
     // Input
@@ -140,6 +140,7 @@ void build_screen() {
     lv_textarea_set_placeholder_text(ui_input, "1+1=69");
     lv_textarea_set_one_line(ui_input, true);
     lv_obj_set_style_anim_time(ui_input, 5000, LV_PART_CURSOR|LV_STATE_FOCUSED);
+    lv_textarea_set_max_length(ui_input, MAX_INPUT_LENGTH);
     // Textarea event handler
     lv_obj_add_event_cb(ui_input, textarea_event_handler, LV_EVENT_READY, ui_input);
 }
@@ -170,11 +171,9 @@ int main() {
     // Initialize the keyboard input device (implementation in lv_port_indev_kbd.c)
     lv_port_indev_init();
 
-    // Define two fonts size styles: 12 and 14
-    lv_style_init(&font_12);
-    lv_style_set_text_font(&font_12, &lv_font_montserrat_12);
-    lv_style_init(&font_14);
-    lv_style_set_text_font(&font_14, &lv_font_montserrat_14);
+    // Define font styles
+    lv_style_init(&font_monospace);
+    lv_style_set_text_font(&font_monospace, &font_terminus);
 
     // Build the screen
     build_screen();

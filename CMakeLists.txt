@@ -38,6 +38,7 @@ add_executable(picocalc_calc
     main.c
     utils.c
     lib/tinyexpr/tinyexpr.c
+    font_terminus.c
     lv_port_indev_picocalc_kb.c
     lv_port_disp_picocalc_ILI9488.c
 )
