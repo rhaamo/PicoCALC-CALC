@@ -43,6 +43,8 @@ void handle_textarea_command(const char *command_input) {
     int err = 0;
     double result = te_interp(command_input, &err);
 
+    printf("\nTinyExpr: err=%i, result=%f", err, result);
+
     lv_label_ins_text(ui_history, -1, "\n");
     // Max input plus 10 to be safe
     char buffer[MAX_INPUT_LENGTH + 10];
@@ -52,23 +54,28 @@ void handle_textarea_command(const char *command_input) {
       snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err - 1, " ");
       lv_label_ins_text(ui_history, -1, buffer);
     } else {
-      // Now properly print/format the result
-      if (round(result) == result) {
-        // Print as rounded
-        snprintf(buffer, sizeof(buffer), "%i", (int)result);
+      // first sanity checks
+      if (result == INFINITY) {
+        lv_label_ins_text(ui_history, -1, "NO :(");
       } else {
-        // Print with all precision
-        // TODO: how do I avoid trailing zeroes :(
-        snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+        // Now properly print/format the result
+        if (round(result) == result) {
+          // Print as rounded
+          snprintf(buffer, sizeof(buffer), "%i", (int)result);
+        } else {
+          // Print with all precision
+          // TODO: how do I avoid trailing zeroes :(
+          snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+        }
+        lv_label_ins_text(ui_history, -1, buffer);
       }
-      lv_label_ins_text(ui_history, -1, buffer);
     }
   }
 
   // Then scroll the history to the bottom
   // (it's borked)
   lv_obj_t *parent = lv_obj_get_parent(ui_history);
-  printf("cur scroll: %i", lv_obj_get_scroll_bottom(parent));
+  printf("\ncur scroll: %i", lv_obj_get_scroll_bottom(parent));
   lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
 }
 
