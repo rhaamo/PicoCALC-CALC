@@ -10,6 +10,12 @@ void handle_textarea_command(const char *command_input) {
   } else if (strcmp(command_input, "uwu") == 0) {
     // UwU
     lv_label_ins_text(ui_history, -1, "\n*snuggle you :3*");
+  } else if (strcmp(command_input, "ver") == 0) {
+    // Version
+    lv_label_ins_text(ui_history, -1, "\nBuilt on: ");
+    lv_label_ins_text(ui_history, -1, __DATE__);
+    lv_label_ins_text(ui_history, -1, " @ ");
+    lv_label_ins_text(ui_history, -1, __TIME__);
   } else if (strcmp(command_input, "mem") == 0) {
     // Memory
     char mem_buff[40];
@@ -36,6 +42,7 @@ void handle_textarea_command(const char *command_input) {
     lv_label_ins_text(ui_history, -1, "\nreset: soft reset");
     lv_label_ins_text(ui_history, -1, "\nbat: get battery level");
     lv_label_ins_text(ui_history, -1, "\nmem: show memory usage");
+    lv_label_ins_text(ui_history, -1, "\nver: show version");
     lv_label_ins_text(ui_history, -1, "\nuwu: ???");
     lv_label_ins_text(ui_history, -1, "\nanything else will be fed to tinyexpr (he's hungry)");
   } else {
