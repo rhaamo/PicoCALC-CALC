@@ -25,7 +25,7 @@ Requires keyboard firmware update for battery display.
 flash: reset in flash mode
 reset: soft reset
 bat: get battery level
-nmem: show memory usage (broken)
+mem: show memory usage (broken)
 ver: show version
 uwu: ???
 anything else will be fed to tinyexpr (he's hungry)
