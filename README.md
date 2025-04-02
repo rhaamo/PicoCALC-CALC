@@ -10,8 +10,18 @@ Requires keyboard firmware update for battery display.
 
 ## Issues
 
-- Scrolling for history is really bad and eats a bit of the bottom text
-- Need fix in kbd handling to remove workaround code
+- Scrolling for history is still broken and doesn't work
+- Need fix in kbd handling to remove workaround code https://github.com/clockworkpi/PicoCalc/issues/10
+
+## Current commands
+
+```
+flash: reset in flash mode
+reset: soft reset
+bat: get battery level
+uwu: ???
+anything else will be fed to tinyexpr (he's hungry)
+```
 
 ## Build Instructions
 ```bash
