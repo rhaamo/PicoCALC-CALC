@@ -14,6 +14,10 @@ Requires keyboard firmware update for battery display.
 
 - Scrolling for history is still broken and doesn't work
 - Need fix in kbd handling to remove workaround code https://github.com/clockworkpi/PicoCalc/issues/10
+- Need a monospace font for history
+
+## Features
+- Maths! It does uses the [TinyExpr](https://github.com/codeplea/tinyexpr) library, it isn't super fresh but it does work.
 
 ## Current commands
 

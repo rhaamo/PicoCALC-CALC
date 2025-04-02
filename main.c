@@ -21,7 +21,7 @@ void handle_textarea_command(const char *command_input) {
             lv_label_ins_text(ui_history, -1, "ERR%");
         } else {
             char bat_buff[10];
-            snprintf(bat_buff, sizeof(bat_buff), "%i%%", bat_level);
+            lv_snprintf(bat_buff, sizeof(bat_buff), "%i%%", bat_level);
             lv_label_ins_text(ui_history, -1, bat_buff);
         }
     } else if (strcmp(command_input, "help") == 0) {
@@ -35,21 +35,25 @@ void handle_textarea_command(const char *command_input) {
     } else {
         // It's probably math, I hope
         int err = 0;
-        double result = te_interp(sanitize_command(command_input), 0);
+        double result = te_interp(sanitize_command(command_input), &err);
 
         lv_label_ins_text(ui_history, -1, "\n");
+        char buffer[32];
+
         if (err != 0) {
-            lv_label_ins_text(ui_history, -1, "NaN :(");
+            // Implement some visual error thingy with space padding
+            // TODO: doesn't really pad properly, probably because a monospace font is needed
+            lv_snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err, " ");
+            lv_label_ins_text(ui_history, -1, buffer);
         } else {
             // Now properly print/format the result
-            char buffer[32];
             if (round(result) == result) {
                 // Print as rounded
-                snprintf(buffer, sizeof(buffer), "%i", (int)result);
+                lv_snprintf(buffer, sizeof(buffer), "%i", (int)result);
             } else {
                 // Print with all precision
                 // TODO: how do I avoid trailing zeroes :(
-                snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+                    lv_snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
             }
             lv_label_ins_text(ui_history, -1, buffer);
         }
