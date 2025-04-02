@@ -35,7 +35,7 @@ void handle_textarea_command(const char *command_input) {
     } else {
         // It's probably math, I hope
         int err = 0;
-        double result = te_interp(sanitize_command(command_input), &err);
+        double result = te_interp(command_input, &err);
 
         lv_label_ins_text(ui_history, -1, "\n");
         // Max input plus 10 to be safe
@@ -189,7 +189,7 @@ int main() {
     // Main loop
     while (1) {
         lv_timer_handler();
-        lv_tick_inc(5); // Increment LVGL tick by 5 milliseconds
+        lv_tick_inc(20); // Increment LVGL tick by 20 milliseconds
 
         // Runs every ~minutes
         if (lv_tick_get()-last_1min_tick >= 60000) {
@@ -201,6 +201,6 @@ int main() {
             last_1min_tick = lv_tick_get();
         }
 
-        sleep_ms(1); // Sleep for 5 milliseconds
+        sleep_ms(5); // Sleep for 5 milliseconds
     }
 }
