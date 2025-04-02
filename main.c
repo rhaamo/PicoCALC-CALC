@@ -11,7 +11,13 @@ void handle_textarea_command(const char *command_input) {
     } else if (strcmp(command_input, "uwu") == 0) {
         // UwU
         lv_label_ins_text(ui_history, -1, "\n*snuggle you :3*");
-    } else if (strcmp(command_input, "reset") == 0) {
+    } else if (strcmp(command_input, "mem") == 0) {
+        // Memory
+        char mem_buff[40];
+        // TODO FIXME: Both returns the same value *clown emoji*
+        snprintf(mem_buff, sizeof(mem_buff), "\nFree: %i Total: %i bytes", get_free_heap(), get_total_heap());
+        lv_label_ins_text(ui_history, -1, mem_buff);
+} else if (strcmp(command_input, "reset") == 0) {
         // Soft reset
         *((volatile uint32_t *)(PPB_BASE + 0x0ED0C)) = 0x5FA0004;
     } else if (strcmp(command_input, "bat") == 0) {
@@ -30,6 +36,7 @@ void handle_textarea_command(const char *command_input) {
         lv_label_ins_text(ui_history, -1, "\nflash: reset in flash mode");
         lv_label_ins_text(ui_history, -1, "\nreset: soft reset");
         lv_label_ins_text(ui_history, -1, "\nbat: get battery level");
+        lv_label_ins_text(ui_history, -1, "\nmem: show memory usage");
         lv_label_ins_text(ui_history, -1, "\nuwu: ???");
         lv_label_ins_text(ui_history, -1, "\nanything else will be fed to tinyexpr (he's hungry)");
     } else {
