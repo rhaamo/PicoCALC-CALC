@@ -26,12 +26,11 @@ void handle_textarea_command(const char *command_input) {
         }
     } else if (strcmp(command_input, "help") == 0) {
         // Commands listing
-        lv_label_ins_text(ui_history, -1, "\nhelp:");
-        lv_label_ins_text(ui_history, -1, "\n  flash: reset in flash mode");
-        lv_label_ins_text(ui_history, -1, "\n  reset: soft reset");
-        lv_label_ins_text(ui_history, -1, "\n  bat: get battery level");
-        lv_label_ins_text(ui_history, -1, "\n  uwu: ???");
-        lv_label_ins_text(ui_history, -1, "\n  anything else will be fed to tinyexpr (he's hungry)");
+        lv_label_ins_text(ui_history, -1, "\nflash: reset in flash mode");
+        lv_label_ins_text(ui_history, -1, "\nreset: soft reset");
+        lv_label_ins_text(ui_history, -1, "\nbat: get battery level");
+        lv_label_ins_text(ui_history, -1, "\nuwu: ???");
+        lv_label_ins_text(ui_history, -1, "\nanything else will be fed to tinyexpr (he's hungry)");
     } else {
         // It's probably math, I hope
         int err = 0;
@@ -139,7 +138,7 @@ void build_screen() {
     // Enable keyboard input for the text box
     lv_textarea_set_placeholder_text(ui_input, "1+1=69");
     lv_textarea_set_one_line(ui_input, true);
-    lv_obj_set_style_anim_time(ui_input, 5000, LV_PART_CURSOR|LV_STATE_FOCUSED);
+    lv_obj_set_style_anim_time(ui_input, 1000, LV_PART_CURSOR|LV_STATE_FOCUSED);
     lv_textarea_set_max_length(ui_input, MAX_INPUT_LENGTH);
     // Textarea event handler
     lv_obj_add_event_cb(ui_input, textarea_event_handler, LV_EVENT_READY, ui_input);
