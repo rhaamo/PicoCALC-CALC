@@ -21,7 +21,7 @@ void handle_textarea_command(const char *command_input) {
             lv_label_ins_text(ui_history, -1, "ERR%");
         } else {
             char bat_buff[10];
-            lv_snprintf(bat_buff, sizeof(bat_buff), "%i%%", bat_level);
+            snprintf(bat_buff, sizeof(bat_buff), "%i%%", bat_level);
             lv_label_ins_text(ui_history, -1, bat_buff);
         }
     } else if (strcmp(command_input, "help") == 0) {
@@ -43,17 +43,17 @@ void handle_textarea_command(const char *command_input) {
 
         if (err != 0) {
             // Implement some visual error thingy with space padding
-            lv_snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err-1, " ");
+            snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err-1, " ");
             lv_label_ins_text(ui_history, -1, buffer);
         } else {
             // Now properly print/format the result
             if (round(result) == result) {
                 // Print as rounded
-                lv_snprintf(buffer, sizeof(buffer), "%i", (int)result);
+                snprintf(buffer, sizeof(buffer), "%i", (int)result);
             } else {
                 // Print with all precision
                 // TODO: how do I avoid trailing zeroes :(
-                    lv_snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+                snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
             }
             lv_label_ins_text(ui_history, -1, buffer);
         }
