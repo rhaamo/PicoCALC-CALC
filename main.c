@@ -1,5 +1,6 @@
 #include <main.h>
 
+// { temp
 bool is_ascii(char c) {
     return (c>=0 && c<=127);
 }
@@ -27,18 +28,22 @@ char *sanitize_command(const char *in_cmd) {
 
     return out;
 }
+// }
 
 void handle_textarea_command(const char *command_input) {
     printf("Got command: '%s'", command_input);
 
-    // Reboot into flash mode
     if (strcmp(command_input, "flash") == 0) {
+        // Reboot into flash mode
         reset_usb_boot(0, 0);
     } else if (strcmp(command_input, "uwu") == 0) {
+        // UwU
         lv_label_ins_text(ui_history, -1, "\n*snuggle you :3*");
     } else if (strcmp(command_input, "reset") == 0) {
+        // Soft reset
         *((volatile uint32_t *)(PPB_BASE + 0x0ED0C)) = 0x5FA0004;
     } else if (strcmp(command_input, "bat") == 0) {
+        // Show battery level
         lv_label_ins_text(ui_history, -1, "\n");
         int bat_level = read_battery();
         if (bat_level > 100) {
@@ -49,6 +54,7 @@ void handle_textarea_command(const char *command_input) {
             lv_label_ins_text(ui_history, -1, bat_buff);
         }
     } else if (strcmp(command_input, "help") == 0) {
+        // Commands listing
         lv_label_ins_text(ui_history, -1, "\nhelp:");
         lv_label_ins_text(ui_history, -1, "\n  flash: reset in flash mode");
         lv_label_ins_text(ui_history, -1, "\n  reset: soft reset");
@@ -62,16 +68,16 @@ void handle_textarea_command(const char *command_input) {
 
         lv_label_ins_text(ui_history, -1, "\n");
         if (err != 0) {
-            // It's not :(
             lv_label_ins_text(ui_history, -1, "NaN :(");
         } else {
-            // It is :)
             char buffer[32];
             snprintf(buffer, sizeof(buffer), "%f", result);
             lv_label_ins_text(ui_history, -1, buffer);
         }
     }
-    // Scroll to bottom
+
+    // Then scroll the history to the bottom
+    // (it's borked)
     lv_obj_t *parent = lv_obj_get_parent(ui_history);
     printf("cur scroll: %i", lv_obj_get_scroll_bottom(parent));
     lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
@@ -80,7 +86,6 @@ void handle_textarea_command(const char *command_input) {
 static void textarea_event_handler(lv_event_t *e) {
     lv_obj_t *ta = lv_event_get_target_obj(e);
     // Update history
-    //lv_label_set_text_fmt(history, "%s\n> %s", lv_label_get_text(history), lv_textarea_get_text(ta));
     lv_label_ins_text(ui_history, -1, "\n> ");
     lv_label_ins_text(ui_history, -1, lv_textarea_get_text(ta));
     // Handle commands
@@ -182,6 +187,7 @@ int main() {
     // Initialize the keyboard input device (implementation in lv_port_indev_kbd.c)
     lv_port_indev_init();
 
+    // Define two fonts size styles: 12 and 14
     lv_style_init(&font_12);
     lv_style_set_text_font(&font_12, &lv_font_montserrat_12);
     lv_style_init(&font_14);
@@ -193,22 +199,26 @@ int main() {
     // Load the screen
     lv_scr_load(ui_screen);
 
-    // Do it one time
+    // First battery update
     update_battery_level();
 
-    uint32_t last_ticks = lv_tick_get();
+    uint32_t last_1min_tick = lv_tick_get();
 
     // Main loop
     while (1) {
         lv_timer_handler();
         lv_tick_inc(5); // Increment LVGL tick by 5 milliseconds
-        // Update battery every minutes
-        if (lv_tick_get()-last_ticks >= 60000) {
-            printf("one minute elapsed");
+
+        // Runs every ~minutes
+        if (lv_tick_get()-last_1min_tick >= 60000) {
+            printf("Tick: 1min");
+            // Update the battery
             update_battery_level();
-            last_ticks = lv_tick_get();
+
+            // Then update the last 1min tick
+            last_1min_tick = lv_tick_get();
         }
 
-        sleep_ms(1); // Sleep for 5 milliseconds}
+        sleep_ms(1); // Sleep for 5 milliseconds
     }
 }

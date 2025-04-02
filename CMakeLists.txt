@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.16)
 # Setup board for Pico 2W
 set(PICO_BOARD pico2)
 
+# Needs to be before project()
 include(pico_sdk_import.cmake)
 
 project(picocalc_calc C CXX ASM)
@@ -20,6 +21,13 @@ include_directories(
 
 # To get the right files for VSCode at least
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+# https://github.com/raspberrypi/pico-sdk/issues/1605 ?
+# For some reasons, the stdlib stuff doesn't get included in the compile_commands.json file
+# resulting in pretty much anything std to not be totally detected and found, throwing a shitload
+# of clangd errors
+set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES /usr/arm-none-eabi/include)
+
 
 add_subdirectory(i2ckbd)
 add_subdirectory(lcdspi)
