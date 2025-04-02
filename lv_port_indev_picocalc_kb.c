@@ -8,7 +8,8 @@
 /*********************
  *      INCLUDES
  *********************/
- #include "i2ckbd.h"
+ #include "core/lv_group.h"
+#include "i2ckbd.h"
  #include <stdio.h>
  #include <string.h>
  #include <pico/stdio.h>
@@ -120,15 +121,16 @@
          /* Translate the keys to LVGL control characters according to your key definitions */
          switch (r) {
              case 0xb5: // Arrow Up
-                 act_key = LV_KEY_NEXT;
+                 act_key = LV_KEY_UP;
                  break;
              case 0xb6: // Arrow Down
-                 act_key = LV_KEY_PREV;
+                 act_key = LV_KEY_DOWN;
                  break;
              case 0xb4: // Arrow Left
+                 act_key = LV_KEY_LEFT;
              case 0xb7: // Arrow Right
-                 printf("WARN: ARROW Left/Right key not mapped\n");
-                 act_key = 0;
+                 //printf("WARN: ARROW Left/Right key not mapped\n");
+                 act_key = LV_KEY_RIGHT;
                  break;
  
              // Special Keys

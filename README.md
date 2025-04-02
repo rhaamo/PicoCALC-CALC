@@ -13,8 +13,8 @@ Requires keyboard firmware update for battery display.
 ## Issues
 
 - Scrolling for history is still broken and doesn't work
-- Need fix in kbd handling to remove workaround code https://github.com/clockworkpi/PicoCalc/issues/10
 - "long" inputs with errors doesn't line up properly somehow
+- Makes the directional keys actually do something in the textarea
 
 ## Features
 - Maths! It does uses the [TinyExpr](https://github.com/codeplea/tinyexpr) library, it isn't super fresh but it does work.
