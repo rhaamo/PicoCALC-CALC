@@ -1,15 +1,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <stdio.h> // IWYU pragma: keep
-#include <stdbool.h>
-#include <stdlib.h> // IWYU pragma: keep
-#include <string.h> // IWYU pragma: keep
 #include <float.h>
 #include <math.h> // IWYU pragma: keep
+#include <stdbool.h>
+#include <stdio.h>  // IWYU pragma: keep
+#include <stdlib.h> // IWYU pragma: keep
+#include <string.h> // IWYU pragma: keep
 
-#include <lv_port_indev_picocalc_kb.h>
 #include <lv_port_disp_picocalc_ILI9488.h>
+#include <lv_port_indev_picocalc_kb.h>
 
 #include <pico/bootrom.h>
 

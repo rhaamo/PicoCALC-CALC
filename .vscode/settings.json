@@ -17,5 +17,7 @@
       }
   },
   "cmake.buildBeforeRun": true,
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+"editor.formatOnSave": true,
+"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
 }
