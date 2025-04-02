@@ -36,6 +36,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/lib/lvgl lvgl)
 
 add_executable(picocalc_calc
     main.c
+    utils.c
     lib/tinyexpr/tinyexpr.c
     lv_port_indev_picocalc_kb.c
     lv_port_disp_picocalc_ILI9488.c
