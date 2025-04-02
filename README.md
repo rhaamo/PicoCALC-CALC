@@ -4,7 +4,7 @@ This has been tested only with a Pico 2W.
 
 Build, flash, and type "help".
 
-<img src="https://raw.githubusercontent.com/rhaamo/PicoCALC-CALC/refs/heads/main/hw.jpg" width="400">
+<img src="https://raw.githubusercontent.com/rhaamo/PicoCALC-CALC/refs/heads/main/hw.jpg" width="500">
 
 ## Notes
 
