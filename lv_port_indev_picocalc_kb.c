@@ -128,6 +128,7 @@
                  break;
              case 0xb4: // Arrow Left
                  act_key = LV_KEY_LEFT;
+                 break;
              case 0xb7: // Arrow Right
                  //printf("WARN: ARROW Left/Right key not mapped\n");
                  act_key = LV_KEY_RIGHT;

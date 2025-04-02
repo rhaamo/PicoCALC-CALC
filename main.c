@@ -1,3 +1,4 @@
+#include "widgets/textarea/lv_textarea.h"
 #include <main.h>
 #include <utils.h>
 
@@ -65,7 +66,7 @@ void handle_textarea_command(const char *command_input) {
     lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
 }
 
-static void textarea_event_handler(lv_event_t *e) {
+static void textarea_ev_ready(lv_event_t *e) {
     lv_obj_t *ta = lv_event_get_target_obj(e);
     // Update history
     lv_label_ins_text(ui_history, -1, "\n> ");
@@ -75,6 +76,29 @@ static void textarea_event_handler(lv_event_t *e) {
     // Clear input
     lv_textarea_set_text(ui_input, "");
 }
+
+static void textarea_ev_keys(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if (code == LV_EVENT_KEY) {
+        uint32_t key = *((uint32_t *)lv_event_get_param(e));
+        switch (key) {
+            case LV_KEY_LEFT:
+                lv_textarea_cursor_left(ui_input);
+                break;
+            case LV_KEY_RIGHT:
+                lv_textarea_cursor_right(ui_input);
+                break;
+            case LV_KEY_HOME:
+                lv_textarea_set_cursor_pos(ui_input, 0);
+                break;
+            case LV_KEY_END:
+                lv_textarea_set_cursor_pos(ui_input, LV_TEXTAREA_CURSOR_LAST);
+                break;
+        }
+    }
+}
+
 
 void build_screen() {
     // Screen
@@ -140,8 +164,10 @@ void build_screen() {
     lv_textarea_set_one_line(ui_input, true);
     lv_obj_set_style_anim_time(ui_input, 1000, LV_PART_CURSOR|LV_STATE_FOCUSED);
     lv_textarea_set_max_length(ui_input, MAX_INPUT_LENGTH);
-    // Textarea event handler
-    lv_obj_add_event_cb(ui_input, textarea_event_handler, LV_EVENT_READY, ui_input);
+    // Textarea event handler for enter
+    lv_obj_add_event_cb(ui_input, textarea_ev_ready, LV_EVENT_READY, ui_input);
+    // That one for directional keys
+    lv_obj_add_event_cb(ui_input, textarea_ev_keys, LV_EVENT_KEY, ui_input);
 }
 
 void update_battery_level() {
