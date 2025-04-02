@@ -70,8 +70,16 @@ void handle_textarea_command(const char *command_input) {
         if (err != 0) {
             lv_label_ins_text(ui_history, -1, "NaN :(");
         } else {
+            // Now properly print/format the result
             char buffer[32];
-            snprintf(buffer, sizeof(buffer), "%f", result);
+            if (round(result) == result) {
+                // Print as rounded
+                snprintf(buffer, sizeof(buffer), "%i", (int)result);
+            } else {
+                // Print with all precision
+                // TODO: how do I avoid trailing zeroes :(
+                snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+            }
             lv_label_ins_text(ui_history, -1, buffer);
         }
     }
