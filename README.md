@@ -4,6 +4,8 @@ This has been tested only with a Pico 2W.
 
 Build, flash, and type "help".
 
+<img src="https://raw.githubusercontent.com/rhaamo/PicoCALC-CALC/refs/heads/main/hw.jpg" width="200">
+
 ## Notes
 
 Requires keyboard firmware update for battery display.
