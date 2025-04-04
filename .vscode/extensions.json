@@ -2,7 +2,6 @@
   "recommendations": [
       "ms-vscode.cmake-tools",
       "llvm-vs-code-extensions.vscode-clangd",
-      "raspberry-pi.raspberry-pi-pico",
       "ms-vscode.vscode-serial-monitor"
   ]
 }

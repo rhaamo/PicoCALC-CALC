@@ -12,6 +12,7 @@
 #include <lv_port_indev_picocalc_kb.h>
 
 #include <ds3231.h>
+#include <hardware/i2c.h>
 #include <pico/bootrom.h>
 
 #include <i2ckbd.h>

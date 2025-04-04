@@ -222,13 +222,23 @@ int main() {
   gpio_set_dir(LEDPIN, GPIO_OUT);
 
   // Init RTC
-  int rtc_err = ds3231_init(&ds3231, i2c_default, DS3231_DEVICE_ADRESS, AT24C32_EEPROM_ADRESS_0);
+  int rtc_err = ds3231_init(&ds3231, i2c0, DS3231_DEVICE_ADRESS, AT24C32_EEPROM_ADRESS_0);
   if (rtc_err) {
-    printf("RTC: Init success.");
+    printf("RTC: Init success.\n");
     has_rtc = true;
   } else {
-    printf("RTC: Init failed.");
+    printf("RTC: Init failed.\n");
   }
+
+  // Init I2C for RTC
+  // FIXME TODO: if enabled, the keyboard printf from the lvgl kbd implem doesn't work anymore wtf
+  // gpio_init(RTC_SDA);
+  // gpio_init(RTC_SCL);
+  // gpio_set_function(RTC_SDA, GPIO_FUNC_I2C);
+  // gpio_set_function(RTC_SCL, GPIO_FUNC_I2C);
+  // gpio_pull_up(RTC_SDA);
+  // gpio_pull_up(RTC_SCL);
+  // i2c_init(ds3231.i2c, 400 * 1000);
 
   // Initialize LVGL
   lv_init();
