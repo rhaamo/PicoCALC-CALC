@@ -1,3 +1,4 @@
+#include <config.h>
 #include <main.h>
 #include <utils.h>
 
@@ -119,6 +120,20 @@ static void textarea_ev_keys(lv_event_t *e) {
   }
 }
 
+void update_time() {
+  if (!has_rtc) {
+    return;
+  }
+  // Get time from RTC
+  if (ds3231_read_current_time(&ds3231, &ds3231_data)) {
+    printf("RTC: No data received\n");
+  } else {
+    // TODO: Update bar too
+    printf("%02u:%02u:%02u    %10s    %02u/%02u/20%02u\n", ds3231_data.hours, ds3231_data.minutes, ds3231_data.seconds, days[ds3231_data.day - 1],
+           ds3231_data.date, ds3231_data.month, ds3231_data.year);
+  }
+}
+
 void build_screen() {
   // Screen
   ui_screen = lv_obj_create(NULL);
@@ -206,6 +221,15 @@ int main() {
   gpio_init(LEDPIN);
   gpio_set_dir(LEDPIN, GPIO_OUT);
 
+  // Init RTC
+  int rtc_err = ds3231_init(&ds3231, i2c_default, DS3231_DEVICE_ADRESS, AT24C32_EEPROM_ADRESS_0);
+  if (rtc_err) {
+    printf("RTC: Init success.");
+    has_rtc = true;
+  } else {
+    printf("RTC: Init failed.");
+  }
+
   // Initialize LVGL
   lv_init();
 
@@ -228,6 +252,8 @@ int main() {
   // First battery update
   update_battery_level();
 
+  update_time();
+
   uint32_t last_1min_tick = lv_tick_get();
 
   // Main loop
@@ -240,6 +266,7 @@ int main() {
       printf("Tick: 1min");
       // Update the battery
       update_battery_level();
+      update_time();
 
       // Then update the last 1min tick
       last_1min_tick = lv_tick_get();
