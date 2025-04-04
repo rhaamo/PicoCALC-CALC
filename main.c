@@ -122,15 +122,17 @@ static void textarea_ev_keys(lv_event_t *e) {
 
 void update_time() {
   if (!has_rtc) {
+    printf("RTC: not available\n");
     return;
   }
   // Get time from RTC
-  if (ds3231_read_current_time(&ds3231, &ds3231_data)) {
-    printf("RTC: No data received\n");
-  } else {
-    // TODO: Update bar too
+  if (ds3231_read_current_time(&ds3231, &ds3231_data) == 0) {
+    // TODO: Update top bar too
+    printf("RTC: ");
     printf("%02u:%02u:%02u    %10s    %02u/%02u/20%02u\n", ds3231_data.hours, ds3231_data.minutes, ds3231_data.seconds, days[ds3231_data.day - 1],
            ds3231_data.date, ds3231_data.month, ds3231_data.year);
+  } else {
+    printf("RTC: No data received\n");
   }
 }
 
@@ -223,15 +225,16 @@ int main() {
 
   // Init RTC
   int rtc_err = ds3231_init(&ds3231, i2c0, DS3231_DEVICE_ADRESS, AT24C32_EEPROM_ADRESS_0);
-  if (rtc_err) {
-    printf("RTC: Init success.\n");
-    has_rtc = true;
+  if (rtc_err == 0) {
+    printf("RTC: Init success: %i\n", rtc_err);
+    // cannot enable anyway, it will froze everything on the first try to get time, see comment later
+    has_rtc = false;
   } else {
-    printf("RTC: Init failed.\n");
+    printf("RTC: Init failed: %i\n", rtc_err);
   }
 
   // Init I2C for RTC
-  // FIXME TODO: if enabled, the keyboard printf from the lvgl kbd implem doesn't work anymore wtf
+  // FIXME TODO: if enabled, the serial output doesn't work anymore
   // gpio_init(RTC_SDA);
   // gpio_init(RTC_SCL);
   // gpio_set_function(RTC_SDA, GPIO_FUNC_I2C);
