@@ -32,6 +32,7 @@ set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES /usr/arm-none-eabi/include)
 add_subdirectory(i2ckbd)
 add_subdirectory(lcdspi)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/lib/lvgl lvgl)
+add_subdirectory(lib/pico-ds3231/libraries/ds3231)
 
 
 add_executable(picocalc_calc
@@ -72,6 +73,7 @@ target_link_libraries(picocalc_calc
   i2ckbd
   lcdspi
   lvgl
+  pico_ds3231
 )
 
 pico_enable_stdio_usb(picocalc_calc 0)

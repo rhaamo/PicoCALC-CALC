@@ -5,3 +5,6 @@
 	path = lib/lvgl/lvgl
 	url = https://github.com/lvgl/lvgl.git
 	branch = release/v9.2
+[submodule "lib/pico-ds3231"]
+	path = lib/pico-ds3231
+	url = https://github.com/alpertng02/pico-ds3231
