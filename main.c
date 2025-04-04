@@ -3,7 +3,7 @@
 #include <utils.h>
 
 void handle_textarea_command(const char *command_input) {
-  printf("Got command: '%s'", command_input);
+  printf("Got command: '%s'\n", command_input);
 
   if (strcmp(command_input, "flash") == 0) {
     // Reboot into flash mode
@@ -51,7 +51,7 @@ void handle_textarea_command(const char *command_input) {
     int err = 0;
     double result = te_interp(command_input, &err);
 
-    printf("\nTinyExpr: err=%i, result=%f", err, result);
+    printf("TinyExpr: err=%i, result=%f\n", err, result);
 
     lv_label_ins_text(ui_history, -1, "\n");
     // Max input plus 10 to be safe
@@ -83,7 +83,7 @@ void handle_textarea_command(const char *command_input) {
   // Then scroll the history to the bottom
   // (it's borked)
   lv_obj_t *parent = lv_obj_get_parent(ui_history);
-  printf("\ncur scroll: %i", lv_obj_get_scroll_bottom(parent));
+  printf("cur scroll: %i\n", lv_obj_get_scroll_bottom(parent));
   lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
 }
 
@@ -273,7 +273,7 @@ int main() {
 
     // Runs every ~minutes
     if (lv_tick_get() - last_1min_tick >= 60000) {
-      printf("Tick: 1min");
+      printf("Tick: 1min\n");
       // Update the battery
       update_battery_level();
       update_time();
