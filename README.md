@@ -18,7 +18,6 @@ Requires keyboard firmware update for battery display.
 
 ## Features
 - Maths! It does uses the [TinyExpr](https://github.com/codeplea/tinyexpr) library, it isn't super fresh but it does work.
-- RTC with a hardware mod https://forum.clockworkpi.com/t/rtc-inside-the-case/16484/2
 
 ## Current commands
 
@@ -36,7 +35,9 @@ anything else will be fed to tinyexpr (he's hungry)
 - Fix the history scroll issue
 - Implement up/down for the history maybe
 - Idk maybe commands history ?
-- Implement `time set` `time` etc.
+- RTC with a hardware mod https://forum.clockworkpi.com/t/rtc-inside-the-case/16484/2
+  - Implement `time set` `time` etc. (Could uses GP0/GP1 to avoid overlapping on the PSRAM pins, plus GP28 for the interrupt pin)
+- Enable PSRAM ?
 
 ## Build Instructions
 ```bash
