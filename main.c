@@ -11,6 +11,22 @@ void handle_textarea_command(const char *command_input) {
   } else if (strcmp(command_input, "uwu") == 0) {
     // UwU
     lv_label_ins_text(ui_history, -1, "\n*snuggle you :3*");
+  } else if (strcmp(command_input, "time") == 0) {
+    // Time
+    if (!has_rtc) {
+      lv_label_ins_text(ui_history, -1, "\nRTC not available");
+      return;
+    }
+    // Get time from RTC
+    if (ds3231_read_current_time(&ds3231, &ds3231_data) == 0) {
+      // TODO: Update top bar too
+      char time_buff[50];
+      snprintf(time_buff, sizeof(time_buff), "\n%02u:%02u:%02u    %10s    %02u/%02u/20%02u\n", ds3231_data.hours, ds3231_data.minutes, ds3231_data.seconds,
+               days[ds3231_data.day - 1], ds3231_data.date, ds3231_data.month, ds3231_data.year);
+      lv_label_ins_text(ui_history, -1, time_buff);
+    } else {
+      lv_label_ins_text(ui_history, -1, "\nGet time failed");
+    }
   } else if (strcmp(command_input, "ver") == 0) {
     // Version
     lv_label_ins_text(ui_history, -1, "\nBuilt on: ");
@@ -44,6 +60,7 @@ void handle_textarea_command(const char *command_input) {
     lv_label_ins_text(ui_history, -1, "\nbat: get battery level");
     lv_label_ins_text(ui_history, -1, "\nmem: show memory usage");
     lv_label_ins_text(ui_history, -1, "\nver: show version");
+    lv_label_ins_text(ui_history, -1, "\ntime: get time");
     lv_label_ins_text(ui_history, -1, "\nuwu: ???");
     lv_label_ins_text(ui_history, -1, "\nanything else will be fed to tinyexpr (he's hungry)");
   } else {
@@ -219,6 +236,8 @@ int main() {
   // Initialize standard I/O
   stdio_init_all();
 
+  printf("STDIO: init all done.\n");
+
   // Initialize LED
   gpio_init(LEDPIN);
   gpio_set_dir(LEDPIN, GPIO_OUT);
@@ -227,21 +246,21 @@ int main() {
   int rtc_err = ds3231_init(&ds3231, i2c0, DS3231_DEVICE_ADRESS, AT24C32_EEPROM_ADRESS_0);
   if (rtc_err == 0) {
     printf("RTC: Init success: %i\n", rtc_err);
-    // cannot enable anyway, it will froze everything on the first try to get time, see comment later
+    // cannot enable anyway, see comment later
     has_rtc = false;
   } else {
     printf("RTC: Init failed: %i\n", rtc_err);
   }
 
   // Init I2C for RTC
-  // FIXME TODO: if enabled, the serial output doesn't work anymore
+  // FIXME TODO: if enabled, the serial output doesn't work anymore...
   // gpio_init(RTC_SDA);
   // gpio_init(RTC_SCL);
   // gpio_set_function(RTC_SDA, GPIO_FUNC_I2C);
   // gpio_set_function(RTC_SCL, GPIO_FUNC_I2C);
   // gpio_pull_up(RTC_SDA);
   // gpio_pull_up(RTC_SCL);
-  // i2c_init(ds3231.i2c, 400 * 1000);
+  // i2c_init(ds3231.i2c, 10000); // dual i2c so 10khz max
 
   // Initialize LVGL
   lv_init();
