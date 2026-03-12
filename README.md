@@ -13,7 +13,6 @@ Requires keyboard firmware update for battery display.
 ## Issues
 
 - "long" inputs with errors doesn't line up properly somehow
-- Directional key left/right goes two chars instead of one ???
 
 ## Features
 - Maths! It does uses the [TinyExpr](https://github.com/codeplea/tinyexpr) library, it isn't super fresh but it does work.

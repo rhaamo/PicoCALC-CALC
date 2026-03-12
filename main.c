@@ -164,18 +164,6 @@ static void textarea_ev_keys(lv_event_t *e) {
         lv_textarea_set_text(ui_input, "");
         break;
       }
-      case LV_KEY_LEFT:
-        lv_textarea_cursor_left(ui_input);
-        break;
-      case LV_KEY_RIGHT:
-        lv_textarea_cursor_right(ui_input);
-        break;
-      case LV_KEY_HOME:
-        lv_textarea_set_cursor_pos(ui_input, 0);
-        break;
-      case LV_KEY_END:
-        lv_textarea_set_cursor_pos(ui_input, LV_TEXTAREA_CURSOR_LAST);
-        break;
     }
   }
 }
