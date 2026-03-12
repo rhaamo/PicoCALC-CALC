@@ -12,7 +12,6 @@ Requires keyboard firmware update for battery display.
 
 ## Issues
 
-- Scrolling for history is still broken and doesn't work
 - "long" inputs with errors doesn't line up properly somehow
 - Directional key left/right goes two chars instead of one ???
 
@@ -33,7 +32,6 @@ anything else will be fed to tinyexpr (he's hungry)
 
 ## TODO
 - Implement up/down for the history maybe
-- Idk maybe commands history ?
 - RTC with a hardware mod https://forum.clockworkpi.com/t/rtc-inside-the-case/16484/2
   - Implement `time set` `time` etc. (Could uses GP0/GP1 to avoid overlapping on the PSRAM pins, plus GP28 for the interrupt pin)
 - Enable PSRAM ?

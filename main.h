@@ -45,4 +45,10 @@ ds3231_data_t ds3231_data;
 
 bool has_rtc = false;
 
+#define CMD_HISTORY_SIZE 30
+
+char cmd_history[CMD_HISTORY_SIZE][MAX_INPUT_LENGTH];
+int cmd_history_count = 0;
+int cmd_history_index = -1;
+
 #endif

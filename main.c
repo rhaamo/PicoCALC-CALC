@@ -103,6 +103,16 @@ static void textarea_ev_ready(lv_event_t *e) {
   // Update history
   lv_label_ins_text(ui_history, -1, "\n> ");
   lv_label_ins_text(ui_history, -1, lv_textarea_get_text(ta));
+
+  // Add command to history
+  const char *cmd = lv_textarea_get_text(ui_input);
+  if (cmd && strlen(cmd) > 0) {
+    strncpy(cmd_history[cmd_history_count % CMD_HISTORY_SIZE], cmd, MAX_INPUT_LENGTH - 1);
+    cmd_history[cmd_history_count % CMD_HISTORY_SIZE][MAX_INPUT_LENGTH - 1] = '\0';
+    cmd_history_count++;
+  }
+  cmd_history_index = cmd_history_count;  // Reset navigation position
+
   // Handle commands
   handle_textarea_command(lv_textarea_get_text(ui_input));
   // Clear input
@@ -123,6 +133,37 @@ static void textarea_ev_keys(lv_event_t *e) {
   if (code == LV_EVENT_KEY) {
     uint32_t key = *((uint32_t *)lv_event_get_param(e));
     switch (key) {
+      case LV_KEY_UP: {
+        if (cmd_history_count == 0) break;
+        int start_idx = cmd_history_count > CMD_HISTORY_SIZE ? cmd_history_count - CMD_HISTORY_SIZE : 0;
+        if (cmd_history_index <= start_idx) {
+          cmd_history_index = start_idx;  // Stop at oldest
+          break;
+        }
+        cmd_history_index--;
+        int idx = cmd_history_index % CMD_HISTORY_SIZE;
+        lv_textarea_set_text(ui_input, cmd_history[idx]);
+        lv_textarea_set_cursor_pos(ui_input, LV_TEXTAREA_CURSOR_LAST);
+        break;
+      }
+      case LV_KEY_DOWN: {
+        if (cmd_history_count == 0) break;
+        if (cmd_history_index >= cmd_history_count - 1) {
+          cmd_history_index = cmd_history_count;  // Clear input
+          lv_textarea_set_text(ui_input, "");
+          break;
+        }
+        cmd_history_index++;
+        int idx = cmd_history_index % CMD_HISTORY_SIZE;
+        lv_textarea_set_text(ui_input, cmd_history[idx]);
+        lv_textarea_set_cursor_pos(ui_input, LV_TEXTAREA_CURSOR_LAST);
+        break;
+      }
+      case LV_KEY_ESC: {
+        cmd_history_index = cmd_history_count;
+        lv_textarea_set_text(ui_input, "");
+        break;
+      }
       case LV_KEY_LEFT:
         lv_textarea_cursor_left(ui_input);
         break;
