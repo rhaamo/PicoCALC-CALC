@@ -96,12 +96,6 @@ void handle_textarea_command(const char *command_input) {
       }
     }
   }
-
-  // Then scroll the history to the bottom
-  // (it's borked)
-  lv_obj_t *parent = lv_obj_get_parent(ui_history);
-  printf("cur scroll: %i\n", lv_obj_get_scroll_bottom(parent));
-  lv_obj_scroll_to_y(parent, lv_obj_get_scroll_bottom(parent), LV_ANIM_OFF);
 }
 
 static void textarea_ev_ready(lv_event_t *e) {
@@ -113,6 +107,14 @@ static void textarea_ev_ready(lv_event_t *e) {
   handle_textarea_command(lv_textarea_get_text(ui_input));
   // Clear input
   lv_textarea_set_text(ui_input, "");
+  // Scroll to bottom
+  lv_obj_update_layout(ui_history);
+  lv_obj_t *container = lv_obj_get_parent(ui_history);
+  lv_obj_update_layout(container);
+  int32_t label_h = lv_obj_get_height(ui_history);
+  int32_t cont_h = lv_obj_get_height(container);
+  int32_t scroll_y = label_h > cont_h ? label_h - cont_h + 4 : 0;
+  lv_obj_scroll_to_y(container, scroll_y, LV_ANIM_OFF);
 }
 
 static void textarea_ev_keys(lv_event_t *e) {
@@ -192,15 +194,17 @@ void build_screen() {
   // The container
   ui_history_container = lv_obj_create(ui_screen);
   lv_obj_set_size(ui_history_container, 320, 245);
-  lv_obj_set_flex_flow(ui_history_container, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_scrollbar_mode(ui_history_container, LV_SCROLLBAR_MODE_AUTO);
   lv_obj_set_scroll_dir(ui_history_container, LV_DIR_VER);
+  lv_obj_clear_flag(ui_history_container, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+  lv_obj_set_style_pad_all(ui_history_container, 0, 0);
+  lv_obj_set_style_border_width(ui_history_container, 0, 0);
 
   // The label itself
   ui_history = lv_label_create(ui_history_container);
-  lv_obj_set_height(ui_history, 245);
-  lv_obj_set_width(ui_history, lv_pct(99));
-  lv_obj_set_align(ui_history, LV_ALIGN_CENTER);
+  lv_obj_set_pos(ui_history, 0, 0);
+  lv_obj_set_width(ui_history, 320);
+  lv_obj_set_height(ui_history, LV_SIZE_CONTENT);
   lv_label_set_long_mode(ui_history, LV_LABEL_LONG_WRAP);
   lv_obj_add_style(ui_history, &font_monospace, 0);
   lv_label_set_text(ui_history, "");

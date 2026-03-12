@@ -32,7 +32,6 @@ anything else will be fed to tinyexpr (he's hungry)
 ```
 
 ## TODO
-- Fix the history scroll issue
 - Implement up/down for the history maybe
 - Idk maybe commands history ?
 - RTC with a hardware mod https://forum.clockworkpi.com/t/rtc-inside-the-case/16484/2
