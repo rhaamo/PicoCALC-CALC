@@ -2,12 +2,47 @@
 #include <main.h>
 #include <utils.h>
 
+static int waiting_for_answer = false;
+static const char *current_question = NULL;
+
+void handle_question_yes() {
+  if (strcmp(current_question, "format") == 0) {
+    lv_label_ins_text(ui_history, -1, "\nTODO: format SDCard");
+    waiting_for_answer = false;
+    current_question = NULL;
+  } else {
+    lv_label_ins_text(ui_history, -1, "\nI have no idea what you want :|");
+    waiting_for_answer = false;
+    current_question = NULL;
+  }
+}
+
+void handle_question_no() {
+  if (strcmp(current_question, "format") == 0) {
+    lv_label_ins_text(ui_history, -1, "\nOkay.");
+    waiting_for_answer = false;
+    current_question = NULL;
+  } else {
+    lv_label_ins_text(ui_history, -1, "\nok :(");
+    waiting_for_answer = false;
+    current_question = NULL;
+  }
+}
+
+
 void handle_textarea_command(const char *command_input) {
-  printf("Got command: '%s'\n", command_input);
 
   if (strcmp(command_input, "flash") == 0) {
     // Reboot into flash mode
     reset_usb_boot(0, 0);
+  } else if (strcmp(command_input, "sdcard") == 0) {
+    // TODO: Shows SDCard Status
+    lv_label_ins_text(ui_history, -1, "\nTODO");
+  } else if (strcmp(command_input, "format") == 0) {
+    // TODO: Format SDCard
+    waiting_for_answer = true;
+    current_question = "format";
+    lv_label_ins_text(ui_history, -1, "\nFormat sdcard? (yes/no)");
   } else if (strcmp(command_input, "uwu") == 0) {
     // UwU
     lv_label_ins_text(ui_history, -1, "\n*snuggle you :3*");
@@ -61,38 +96,50 @@ void handle_textarea_command(const char *command_input) {
     lv_label_ins_text(ui_history, -1, "\nmem: show memory usage");
     lv_label_ins_text(ui_history, -1, "\nver: show version");
     lv_label_ins_text(ui_history, -1, "\ntime: get time");
+    lv_label_ins_text(ui_history, -1, "\nsdcard: get sdcard status");
+    lv_label_ins_text(ui_history, -1, "\nformat: format sdcard");
     lv_label_ins_text(ui_history, -1, "\nuwu: ???");
     lv_label_ins_text(ui_history, -1, "\nanything else will be fed to tinyexpr (he's hungry)");
+  } else if (strcmp(command_input, "yes") == 0 && waiting_for_answer) {
+    handle_question_yes();
+  } else if (strcmp(command_input, "no") == 0 && waiting_for_answer) {
+    handle_question_no();
   } else {
-    // It's probably math, I hope
-    int err = 0;
-    double result = te_interp(command_input, &err);
-
-    printf("TinyExpr: err=%i, result=%f\n", err, result);
-
-    lv_label_ins_text(ui_history, -1, "\n");
-    // Max input plus 10 to be safe
-    char buffer[MAX_INPUT_LENGTH + 10];
-
-    if (err != 0) {
-      // Implement some visual error thingy with space padding
-      snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err - 1, " ");
-      lv_label_ins_text(ui_history, -1, buffer);
+    // First, are we waiting for an answer? and it's garbage?
+    if (waiting_for_answer) {
+      // It's not yes, it's not no
+      lv_label_ins_text(ui_history, -1, "\nno!");
     } else {
-      // first sanity checks
-      if (result == INFINITY) {
-        lv_label_ins_text(ui_history, -1, "NO :(");
-      } else {
-        // Now properly print/format the result
-        if (round(result) == result) {
-          // Print as rounded
-          snprintf(buffer, sizeof(buffer), "%i", (int)result);
-        } else {
-          // Print with all precision
-          // TODO: how do I avoid trailing zeroes :(
-          snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
-        }
+      // Then it's probably math, I hope
+      int err = 0;
+      double result = te_interp(command_input, &err);
+
+      printf("TinyExpr: err=%i, result=%f\n", err, result);
+
+      lv_label_ins_text(ui_history, -1, "\n");
+      // Max input plus 10 to be safe
+      char buffer[MAX_INPUT_LENGTH + 10];
+
+      if (err != 0) {
+        // Implement some visual error thingy with space padding
+        snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err - 1, " ");
         lv_label_ins_text(ui_history, -1, buffer);
+      } else {
+        // first sanity checks
+        if (result == INFINITY) {
+          lv_label_ins_text(ui_history, -1, "NO :(");
+        } else {
+          // Now properly print/format the result
+          if (round(result) == result) {
+            // Print as rounded
+            snprintf(buffer, sizeof(buffer), "%i", (int)result);
+          } else {
+            // Print with all precision
+            // TODO: how do I avoid trailing zeroes :(
+            snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+          }
+          lv_label_ins_text(ui_history, -1, buffer);
+        }
       }
     }
   }
