@@ -29,9 +29,40 @@ void handle_question_no() {
   }
 }
 
+void handle_calculations(const char *input) {
+  int err = 0;
+  double result = te_interp(input, &err);
+
+  printf("TinyExpr: err=%i, result=%f\n", err, result);
+
+  lv_label_ins_text(ui_history, -1, "\n");
+  // Max input plus 10 to be safe
+  char buffer[MAX_INPUT_LENGTH + 10];
+
+  if (err != 0) {
+    // Implement some visual error thingy with space padding
+    snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err - 1, " ");
+    lv_label_ins_text(ui_history, -1, buffer);
+  } else {
+    // first sanity checks
+    if (result == INFINITY) {
+      lv_label_ins_text(ui_history, -1, "NO :(");
+    } else {
+      // Now properly print/format the result
+      if (round(result) == result) {
+        // Print as rounded
+        snprintf(buffer, sizeof(buffer), "%i", (int)result);
+      } else {
+        // Print with all precision
+        // TODO: how do I avoid trailing zeroes :(
+        snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
+      }
+      lv_label_ins_text(ui_history, -1, buffer);
+    }
+  }
+}
 
 void handle_textarea_command(const char *command_input) {
-
   if (strcmp(command_input, "flash") == 0) {
     // Reboot into flash mode
     reset_usb_boot(0, 0);
@@ -111,36 +142,7 @@ void handle_textarea_command(const char *command_input) {
       lv_label_ins_text(ui_history, -1, "\nno!");
     } else {
       // Then it's probably math, I hope
-      int err = 0;
-      double result = te_interp(command_input, &err);
-
-      printf("TinyExpr: err=%i, result=%f\n", err, result);
-
-      lv_label_ins_text(ui_history, -1, "\n");
-      // Max input plus 10 to be safe
-      char buffer[MAX_INPUT_LENGTH + 10];
-
-      if (err != 0) {
-        // Implement some visual error thingy with space padding
-        snprintf(buffer, sizeof(buffer), "  %*s^ err :(", err - 1, " ");
-        lv_label_ins_text(ui_history, -1, buffer);
-      } else {
-        // first sanity checks
-        if (result == INFINITY) {
-          lv_label_ins_text(ui_history, -1, "NO :(");
-        } else {
-          // Now properly print/format the result
-          if (round(result) == result) {
-            // Print as rounded
-            snprintf(buffer, sizeof(buffer), "%i", (int)result);
-          } else {
-            // Print with all precision
-            // TODO: how do I avoid trailing zeroes :(
-            snprintf(buffer, sizeof(buffer), "%.*g", DBL_DECIMAL_DIG, result);
-          }
-          lv_label_ins_text(ui_history, -1, buffer);
-        }
-      }
+      handle_calculations(command_input);
     }
   }
 }
